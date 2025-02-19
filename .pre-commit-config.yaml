@@ -21,7 +21,7 @@ repos:
         -   id: tests
             name: run tests
             always_run: true
-            entry: pytest src/ecsapi_client/tests.py
+            entry: pytest
             language: system
             types: [ python ]
             pass_filenames: false

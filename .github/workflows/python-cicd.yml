@@ -50,8 +50,8 @@ jobs:
       - name: Run tests
         run: |
           python3 -m pip install pytest pytest-cov
-          pytest tests.py
-  
+          pytest src/ecsapi_client/tests/*
+
 
   build:
     runs-on: ubuntu-22.04
