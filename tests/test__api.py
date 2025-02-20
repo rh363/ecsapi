@@ -1,5 +1,10 @@
 import json
 
+from src.ecsapi_client._server import (
+    ServerCreateRequest,
+    ServerCreateRequestNetwork,
+    ServerCreateRequestNetworkVlan,
+)
 from src.ecsapi_client.errors import UnauthorizedError, NotFoundError
 from src.ecsapi_client._api import (
     __initialize_env__,
@@ -25,10 +30,29 @@ from src.ecsapi_client._api import (
 )
 import os
 import pytest
-from httmock import urlmatch, HTTMock
+from httmock import urlmatch, HTTMock, all_requests
 from urllib.parse import parse_qs
 
-from tests.store import SERVERS_FETCH_RESPONSE, SERVER_FETCH_RESPONSE
+from tests.store import (
+    SERVERS_FETCH_RESPONSE,
+    SERVER_FETCH_RESPONSE,
+    SERVER_STATUS_FETCH_RESPONSE,
+    PLANS_FETCH_RESPONSE,
+    PLANS_AVAILABLE_FETCH_RESPONSE,
+    REGIONS_FETCH_RESPONSE,
+    REGIONS_AVAILABLE_FETCH_RESPONSE,
+    IMAGES_FETCH_RESPONSE,
+    TEMPLATES_FETCH_RESPONSE,
+    TEMPLATE_FETCH_RESPONSE,
+    TEMPLATE_CREATE_RESPONSE,
+    TEMPLATE_UPDATE_RESPONSE,
+    TEMPLATE_DELETE_RESPONSE,
+    CLOUDSCRIPTS_FETCH_RESPONSE,
+    CLOUDSCRIPT_FETCH_RESPONSE,
+    CLOUDSCRIPT_CREATE_RESPONSE,
+    CLOUDSCRIPT_UPDATE_RESPONSE,
+    SERVER_CREATE_RESPONSE,
+)
 
 
 @urlmatch(netloc=r"localhost:8080")
@@ -64,6 +88,91 @@ def mock_servers_fetch_response(url, request):
     if url.path.endswith("/servers/ec200410"):
         return {"status_code": 200, "content": SERVER_FETCH_RESPONSE}
     return {"status_code": 200, "content": SERVERS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_server_create_response(url, request):
+    return {"status_code": 200, "content": SERVER_CREATE_RESPONSE}
+
+
+@all_requests
+def mock_server_status_fetch_response(url, request):
+    return {"status_code": 200, "content": SERVER_STATUS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_plans_fetch_response(url, request):
+    return {"status_code": 200, "content": PLANS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_plans_available_fetch_response(url, request):
+    return {"status_code": 200, "content": PLANS_AVAILABLE_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_regions_fetch_response(url, request):
+    return {"status_code": 200, "content": REGIONS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_regions_available_fetch_response(url, request):
+    return {"status_code": 200, "content": REGIONS_AVAILABLE_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_images_fetch_response(url, request):
+    return {"status_code": 200, "content": IMAGES_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_templates_fetch_response(url, request):
+    return {"status_code": 200, "content": TEMPLATES_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_template_fetch_response(url, request):
+    return {"status_code": 200, "content": TEMPLATE_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_template_create_response(url, request):
+    return {"status_code": 200, "content": TEMPLATE_CREATE_RESPONSE}
+
+
+@all_requests
+def mock_template_update_response(url, request):
+    return {"status_code": 200, "content": TEMPLATE_UPDATE_RESPONSE}
+
+
+@all_requests
+def mock_template_delete_response(url, request):
+    return {"status_code": 200, "content": TEMPLATE_DELETE_RESPONSE}
+
+
+@all_requests
+def mock_cloud_scripts_fetch_response(url, request):
+    return {"status_code": 200, "content": CLOUDSCRIPTS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_cloud_script_fetch_response(url, request):
+    return {"status_code": 200, "content": CLOUDSCRIPT_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_cloud_script_create_response(url, request):
+    return {"status_code": 200, "content": CLOUDSCRIPT_CREATE_RESPONSE}
+
+
+@all_requests
+def mock_cloud_script_update_response(url, request):
+    return {"status_code": 200, "content": CLOUDSCRIPT_UPDATE_RESPONSE}
+
+
+@all_requests
+def mock_cloud_script_delete_response(url, request):
+    return {"status_code": 200}
 
 
 def get_api():
@@ -350,4 +459,161 @@ def test_Api_fetch_server():
     with HTTMock(mock_servers_fetch_response):
         pytest.raises(NotFoundError, api.fetch_server, "ec12345")
         api.fetch_server("ec200410")
+    assert True
+
+
+def test_Api_create_server():
+    api = get_api()
+
+    def bad_vlan():
+        _ = [ServerCreateRequestNetworkVlan(vlan_id=100, vlans="200-500")]
+
+    def bad_vlan_2():
+        _ = [ServerCreateRequestNetworkVlan(vlan_id=100, vlans="abcde")]
+
+    pytest.raises(ValueError, bad_vlan)
+    pytest.raises(ValueError, bad_vlan_2)
+    vlans = [
+        ServerCreateRequestNetworkVlan(vlan_id=100, pvid=True),
+        ServerCreateRequestNetworkVlan(vlans="200-500"),
+    ]
+    network = ServerCreateRequestNetwork(name="net000001", vlans=vlans)
+    with HTTMock(mock_server_create_response):
+        api.create_server(
+            ServerCreateRequest(
+                plan="eCS1",
+                location="it-fr2",
+                image="almalinux-9",
+                notes="test",
+                password="fOo123456789bAr",
+                reserved_plan="M12PeCS1",
+                support="global",
+                group="eg12345",
+                user_customize=12,
+                user_customize_env='AUTHOR="alex"',
+                ssh_key="my-secret-key",
+                networks=[network],
+            )
+        )
+    assert True
+
+
+def test_Api_fetch_server_status():
+    api = get_api()
+    with HTTMock(mock_server_status_fetch_response):
+        api.fetch_server_status("ec200410")
+    assert True
+
+
+def test_Api_fetch_plans():
+    api = get_api()
+    with HTTMock(mock_plans_fetch_response):
+        api.fetch_plans()
+    assert True
+
+
+def test_Api_fetch_plan_available():
+    api = get_api()
+    with HTTMock(mock_plans_available_fetch_response):
+        api.fetch_plans_available()
+    assert True
+
+
+def test_Api_fetch_regions():
+    api = get_api()
+    with HTTMock(mock_regions_fetch_response):
+        api.fetch_regions()
+    assert True
+
+
+def test_Api_fetch_regions_available():
+    api = get_api()
+    with HTTMock(mock_regions_available_fetch_response):
+        api.fetch_regions_available("ECS1")
+    assert True
+
+
+def test_Api_fetch_images_basics():
+    api = get_api()
+    with HTTMock(mock_images_fetch_response):
+        api.fetch_images_basics()
+    assert True
+
+
+def test_Api_fetch_images_cloud():
+    api = get_api()
+    with HTTMock(mock_images_fetch_response):
+        api.fetch_images_cloud()
+    assert True
+
+
+def test_Api_fetch_templates():
+    api = get_api()
+    with HTTMock(mock_templates_fetch_response):
+        api.fetch_templates()
+    assert True
+
+
+def test_Api_fetch_template():
+    api = get_api()
+    with HTTMock(mock_template_fetch_response):
+        api.fetch_template(593)
+    assert True
+
+
+def test_Api_create_template():
+    api = get_api()
+    with HTTMock(mock_template_create_response):
+        pytest.raises(ValueError, api.create_template)
+        pytest.raises(ValueError, api.create_template, server="ec200410", snapshot=153)
+        api.create_template(server="ec200410")
+    assert True
+
+
+def test_Api_update_template():
+    api = get_api()
+    with HTTMock(mock_template_update_response):
+        api.update_template(600, "dear", "stars")
+    assert True
+
+
+def test_Api_delete_template():
+    api = get_api()
+    with HTTMock(mock_template_delete_response):
+        api.delete_template(600)
+    assert True
+
+
+def test_Api_fetch_scripts():
+    api = get_api()
+    with HTTMock(mock_cloud_scripts_fetch_response):
+        api.fetch_scripts()
+    assert True
+
+
+def test_Api_fetch_script():
+    api = get_api()
+    with HTTMock(mock_cloud_script_fetch_response):
+        api.fetch_script(15)
+    assert True
+
+
+def test_Api_create_script():
+    api = get_api()
+    with HTTMock(mock_cloud_script_create_response):
+        api.create_script("title", "content", False)
+    assert True
+
+
+def test_Api_update_script():
+    api = get_api()
+    with HTTMock(mock_cloud_script_update_response):
+        api.update_script(15, "title", "content", False)
+    assert True
+
+
+def test_Api_delete_script():
+    api = get_api()
+    with HTTMock(mock_cloud_script_delete_response):
+        api.delete_script(15)
     assert True

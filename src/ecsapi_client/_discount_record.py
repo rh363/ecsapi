@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, TypeAdapter
 from datetime import datetime
 
@@ -12,4 +14,4 @@ class DiscountRecord(BaseModel):
     server: str
 
 
-DiscountRecordListAdapter = TypeAdapter(list[DiscountRecord])
+DiscountRecordListAdapter = TypeAdapter(List[DiscountRecord])

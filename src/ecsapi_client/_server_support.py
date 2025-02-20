@@ -1,5 +1,5 @@
 from pydantic import BaseModel, TypeAdapter, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -18,4 +18,4 @@ class ServerSupport(BaseModel):
     cancelled_at: Optional[datetime] = None
 
 
-ServerSupportListAdapter = TypeAdapter(list[ServerSupport])
+ServerSupportListAdapter = TypeAdapter(List[ServerSupport])

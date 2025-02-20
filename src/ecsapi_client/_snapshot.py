@@ -1,5 +1,5 @@
 from pydantic import BaseModel, TypeAdapter
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -27,4 +27,4 @@ class Snapshot(BaseModel):
     api_version: str
 
 
-SnapshotListAdapter = TypeAdapter(list[Snapshot])
+SnapshotListAdapter = TypeAdapter(List[Snapshot])
