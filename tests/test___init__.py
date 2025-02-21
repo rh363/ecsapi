@@ -1,5 +1,5 @@
 import os
-from src.ecsapi_client import __initialize_env_file
+from src.ecsapi import __initialize_env_file
 
 _ = __initialize_env_file
 

@@ -1,4 +1,4 @@
-from ecsapi_client import Api, ServerCreateRequest
+from ecsapi import Api, ServerCreateRequest
 
 api = Api()
 

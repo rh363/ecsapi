@@ -1,4 +1,4 @@
-from ecsapi_client import Api
+from ecsapi import Api
 
 api = Api()
 

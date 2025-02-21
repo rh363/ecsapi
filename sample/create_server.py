@@ -1,5 +1,5 @@
-from ecsapi_client import Api
-from ecsapi_client._server import (
+from ecsapi import Api
+from ecsapi._server import (
     ServerCreateRequest,
 )
 

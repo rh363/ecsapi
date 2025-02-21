@@ -47,15 +47,15 @@ class _TemplateRetrieveResponse(BaseModel):
 
 
 class _TemplateCreateRequest(BaseModel):
-    notes: Optional[str] = Field(default="created by ecsapi_client")
-    description: Optional[str] = Field(default="created by ecsapi_client")
+    notes: Optional[str] = Field(default="created by ecsapi")
+    description: Optional[str] = Field(default="created by ecsapi")
     snapshot: Optional[int] = None
     server: Optional[str] = None
 
     @field_validator("notes", "description", mode="before")
     @classmethod
     def set_default(cls, v):
-        return v or "created by ecsapi_client"
+        return v or "created by ecsapi"
 
     @model_validator(mode="after")
     def check_mutually_exclusive(self) -> Self:

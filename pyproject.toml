@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ecsapi_client"
+name = "ecsapi"
 version = "0.1.0"
 description = "A simple SDK for manage Seeweb ecs api"
 readme = "README.md"

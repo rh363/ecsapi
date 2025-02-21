@@ -122,7 +122,7 @@ class ServerCreateRequest(BaseModel):
     plan: str
     image: str
     location: str
-    notes: Optional[str] = Field(default="created by ecsapi_client")
+    notes: Optional[str] = Field(default="created by ecsapi")
     password: Optional[str] = None
     reserved_plan: Optional[str] = None
     support: Optional[str] = None
@@ -135,7 +135,7 @@ class ServerCreateRequest(BaseModel):
     @field_validator("notes", mode="before")
     @classmethod
     def set_default(cls, v):
-        return v or "created by ecsapi_client"
+        return v or "created by ecsapi"
 
     @model_validator(mode="after")
     def check_mutually_exclusive(self) -> Self:

@@ -1,12 +1,12 @@
 import json
 
-from src.ecsapi_client._server import (
+from src.ecsapi._server import (
     ServerCreateRequest,
     ServerCreateRequestNetwork,
     ServerCreateRequestNetworkVlan,
 )
-from src.ecsapi_client.errors import UnauthorizedError, NotFoundError
-from src.ecsapi_client._api import (
+from src.ecsapi.errors import UnauthorizedError, NotFoundError
+from src.ecsapi._api import (
     __initialize_env__,
     __initialize_token__,
     __initialize_host__,

@@ -27,14 +27,14 @@ class _CloudScriptRetrieveResponse(BaseModel):
 
 
 class _CloudScriptCreateRequest(BaseModel):
-    title: Optional[str] = Field(default="by ecsapi_client")
-    content: Optional[str] = Field(default="by ecsapi_client")
+    title: Optional[str] = Field(default="by ecsapi")
+    content: Optional[str] = Field(default="by ecsapi")
     windows: bool = False
 
     @field_validator("title", "content", mode="before")
     @classmethod
     def set_default(cls, v):
-        return v or "by ecsapi_client"
+        return v or "by ecsapi"
 
 
 class _CloudScriptCreateResponse(BaseModel):
