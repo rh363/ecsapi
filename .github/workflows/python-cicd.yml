@@ -40,17 +40,17 @@ jobs:
       - name: Test format
         run: |
           python3 -m pip install black
-          black --check src/ecsapi_client
+          black --check src/ecsapi
 
       - name: Test lint
         run: |
           python3 -m pip install flake8
-          flake8 src/ecsapi_client
+          flake8 src/ecsapi
 
       - name: Run tests
         run: |
           python3 -m pip install pytest pytest-cov
-          pytest
+          pytest --cov
 
 
   build:
