@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [ Unreleased ]
+
+## [ 0.1.0 ] 2025-02-21
 
 ### Added
 
@@ -29,7 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - CloudScript Get
 - CloudScript Create
 - CloudScript Update
-
-### Changed
-
-### Fixed
+- Ssh Key List
+- Ssh Key Get
+- Ssh Key Create
+- Ssh Key Delete
