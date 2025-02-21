@@ -47,4 +47,13 @@ class ActionExitStatusError(Exception):
         self.last_status = last_status
 
     def __str__(self):
-        return f"Max retry encountered watching action `{self.action_id}` (retry: {self.retry}): exiting with status `{self.last_status}`"
+        return f"Exit status encountered for `{self.action_id}` (retry: {self.retry}): exiting with status `{self.last_status}`"
+
+
+class PlanNotAvailableError(Exception):
+    def __init__(self, plan: str, region: str):
+        self.plan = plan
+        self.region = region
+
+    def __str__(self):
+        return f"Plan `{self.plan}` not available in region `{self.region}`"

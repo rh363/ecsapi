@@ -62,6 +62,7 @@ class _PlanAvailable(BaseModel):
     region_available: List[_PlanAvailableRegionAvailable] = Field(
         ..., alias="region_availables"
     )
+    runtimeclass: Optional[str] = None
 
 
 class _PlanAvailableListResponse(BaseModel):

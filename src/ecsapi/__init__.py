@@ -1,6 +1,6 @@
 from ._api import Api
 from ._plan import Plan, PlanListAdapter
-from ._image import Image, ImageListAdapter
+from ._image import Image, ImageListAdapter, ImageStatusEnum
 from ._region import Region, RegionListAdapter
 from ._server import (
     Server,
@@ -8,12 +8,14 @@ from ._server import (
     ServerCreateRequestNetworkVlan,
     ServerCreateRequestNetwork,
     ServerCreateRequest,
+    ServerStatusEnum,
 )
 from ._cloud_script import CloudScript, CloudScriptListAdapter
 from ._discount_record import DiscountRecord, DiscountRecordListAdapter
 from ._snapshot import Snapshot, SnapshotListAdapter
 from ._server_support import ServerSupport, ServerSupportListAdapter
-from ._action import Action, ActionListAdapter
+from ._action import Action, ActionListAdapter, ActionStatusEnum
+from ._ssh_key import SshKey, SshKeyListAdapter
 from dotenv import load_dotenv
 import os
 
@@ -39,6 +41,7 @@ __all__ = (
         "Snapshot",
         "ServerSupport",
         "Action",
+        "SshKey",
     ]
     + [
         "PlanListAdapter",
@@ -50,10 +53,16 @@ __all__ = (
         "SnapshotListAdapter",
         "ServerSupportListAdapter",
         "ActionListAdapter",
+        "SshKeyListAdapter",
     ]
     + [
         "ServerCreateRequestNetworkVlan",
         "ServerCreateRequestNetwork",
         "ServerCreateRequest",
+    ]
+    + [
+        "ServerStatusEnum",
+        "ImageStatusEnum",
+        "ActionStatusEnum",
     ]
 )

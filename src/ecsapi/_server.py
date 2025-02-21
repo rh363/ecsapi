@@ -1,4 +1,5 @@
 import re
+from enum import Enum
 
 from pydantic import (
     BaseModel,
@@ -16,6 +17,16 @@ from ._action import Action
 from ._discount_record import DiscountRecord
 from ._server_support import ServerSupport
 from ._snapshot import Snapshot
+
+
+class ServerStatusEnum(str, Enum):
+    booting = "Booting"
+    booted = "Booted"
+    deleting = "Deleting"
+    deleted = "Deleted"
+    reimaging = "Reimaging"
+    fail = "Fail"
+    customizing = "Customizing"
 
 
 class ServerPlanSize(BaseModel):
@@ -131,6 +142,7 @@ class ServerCreateRequest(BaseModel):
     user_customize_env: Optional[str] = None
     ssh_key: Optional[str] = None
     networks: Optional[List[ServerCreateRequestNetwork]] = None
+    isolate_from: Optional[List[str]] = None
 
     @field_validator("notes", mode="before")
     @classmethod

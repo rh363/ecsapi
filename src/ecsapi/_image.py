@@ -1,9 +1,18 @@
+from enum import Enum
 from typing import Optional, List
 from typing_extensions import Self
 from pydantic import BaseModel, TypeAdapter, model_validator, Field, field_validator
 from datetime import datetime
 
 from ._action import Action
+
+
+class ImageStatusEnum(str, Enum):
+    creating = "CG"
+    created = "CD"
+    deleting = "DE"
+    deleted = "DD"
+    fail = "FL"
 
 
 class Image(BaseModel):

@@ -5,7 +5,12 @@ from src.ecsapi._server import (
     ServerCreateRequestNetwork,
     ServerCreateRequestNetworkVlan,
 )
-from src.ecsapi.errors import UnauthorizedError, NotFoundError
+from src.ecsapi.errors import (
+    UnauthorizedError,
+    NotFoundError,
+    ActionExitStatusError,
+    ActionMaxRetriesExceededError,
+)
 from src.ecsapi._api import (
     __initialize_env__,
     __initialize_token__,
@@ -52,6 +57,15 @@ from tests.store import (
     CLOUDSCRIPT_CREATE_RESPONSE,
     CLOUDSCRIPT_UPDATE_RESPONSE,
     SERVER_CREATE_RESPONSE,
+    SERVER_UPDATE_RESPONSE,
+    ACTIONS_FETCH_RESPONSE,
+    ACTION_FETCH_RESPONSE,
+    SERVER_DELETE_RESPONSE,
+    SINGLE_ACTION_RESPONSE,
+    SSH_KEYS_FETCH_RESPONSE,
+    SSH_KEY_FETCH_RESPONSE,
+    SSH_KEY_DELETE_RESPONSE,
+    SSH_KEY_CREATE_RESPONSE,
 )
 
 
@@ -90,9 +104,34 @@ def mock_servers_fetch_response(url, request):
     return {"status_code": 200, "content": SERVERS_FETCH_RESPONSE}
 
 
-@all_requests
+@urlmatch(path=r"^/api/v2/servers$")
 def mock_server_create_response(url, request):
     return {"status_code": 200, "content": SERVER_CREATE_RESPONSE}
+
+
+@urlmatch(path=r"^/api/v2/plans/available")
+def mock_server_create_plan_available_response(url, request):
+    return {"status_code": 200, "content": PLANS_AVAILABLE_FETCH_RESPONSE}
+
+
+@urlmatch(method="PUT")
+def mock_server_update_response(url, request):
+    return {"status_code": 200, "content": SERVER_UPDATE_RESPONSE}
+
+
+@urlmatch(method="GET")
+def mock_server_update_fetch_response(url, request):
+    return {"status_code": 200, "content": SERVER_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_server_delete_fetch_response(url, request):
+    return {"status_code": 200, "content": SERVER_DELETE_RESPONSE}
+
+
+@all_requests
+def mock_server_action_response(url, request):
+    return {"status_code": 200, "content": SINGLE_ACTION_RESPONSE}
 
 
 @all_requests
@@ -173,6 +212,41 @@ def mock_cloud_script_update_response(url, request):
 @all_requests
 def mock_cloud_script_delete_response(url, request):
     return {"status_code": 200}
+
+
+@all_requests
+def mock_actions_fetch_response(url, request):
+    return {"status_code": 200, "content": ACTIONS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_action_fetch_response(url, request):
+    return {"status_code": 200, "content": ACTION_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_ssh_keys_fetch_response(url, request):
+    return {"status_code": 200, "content": SSH_KEYS_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_ssh_key_fetch_response(url, request):
+    return {"status_code": 200, "content": SSH_KEY_FETCH_RESPONSE}
+
+
+@all_requests
+def mock_ssh_key_delete_response(url, request):
+    return {"status_code": 200, "content": SSH_KEY_DELETE_RESPONSE}
+
+
+@urlmatch(method="POST")
+def mock_ssh_key_create_response(url, request):
+    return {"status_code": 200, "content": SSH_KEY_CREATE_RESPONSE}
+
+
+@urlmatch(method="GET")
+def mock_ssh_key_create_fetch_response(url, request):
+    return {"status_code": 200, "content": SSH_KEYS_FETCH_RESPONSE}
 
 
 def get_api():
@@ -478,7 +552,9 @@ def test_Api_create_server():
         ServerCreateRequestNetworkVlan(vlans="200-500"),
     ]
     network = ServerCreateRequestNetwork(name="net000001", vlans=vlans)
-    with HTTMock(mock_server_create_response):
+    with HTTMock(
+        mock_server_create_response, mock_server_create_plan_available_response
+    ):
         api.create_server(
             ServerCreateRequest(
                 plan="eCS1",
@@ -493,9 +569,40 @@ def test_Api_create_server():
                 user_customize_env='AUTHOR="alex"',
                 ssh_key="my-secret-key",
                 networks=[network],
-            )
+            ),
+            True,
         )
     assert True
+
+
+def test_Api_update_server():
+    api = get_api()
+    with HTTMock(mock_server_update_response, mock_server_update_fetch_response):
+        api.update_server("ec200410", "david martinez", "edgerunner")
+
+
+def test_Api_delete_server():
+    api = get_api()
+    with HTTMock(mock_server_delete_fetch_response):
+        api.delete_server("ec200410")
+
+
+def test_Api_turn_on_server():
+    api = get_api()
+    with HTTMock(mock_server_action_response):
+        api.turn_on_server("ec200410")
+
+
+def test_Api_turn_off_server():
+    api = get_api()
+    with HTTMock(mock_server_action_response):
+        api.turn_off_server("ec200410")
+
+
+def test_Api_rollback_server():
+    api = get_api()
+    with HTTMock(mock_server_action_response):
+        api.rollback_server("ec200410", 1234)
 
 
 def test_Api_fetch_server_status():
@@ -616,4 +723,77 @@ def test_Api_delete_script():
     api = get_api()
     with HTTMock(mock_cloud_script_delete_response):
         api.delete_script(15)
+    assert True
+
+
+def test_Api_can_create_plan():
+    api = get_api()
+    with HTTMock(mock_plans_available_fetch_response):
+        assert api.can_create_plan("eCS1", "it-fr2")
+        assert not api.can_create_plan("FAKEPLAN", "it-fr2")
+        assert not api.can_create_plan("eCS1", "FAKEREGION")
+        assert not api.can_create_plan("ECS1GPU6", "it-mi2")
+
+
+def test_Api_fetch_actions():
+    api = get_api()
+    with HTTMock(mock_actions_fetch_response):
+        api.fetch_actions(resource="test")
+
+
+def test_Api_fetch_action():
+    api = get_api()
+    with HTTMock(mock_action_fetch_response):
+        api.fetch_action(1234)
+
+
+def test_Api_watch_action():
+    api = get_api()
+
+    def on_fetch(*args, **kwargs):
+        print(args, kwargs)
+
+    with HTTMock(mock_action_fetch_response):
+        with pytest.raises(ActionExitStatusError):
+            api.watch_action(
+                1234, desired_status="not existing status", exit_on_status="completed"
+            )
+        with pytest.raises(ActionMaxRetriesExceededError):
+            api.watch_action(
+                1234,
+                desired_status="not existing status",
+                exit_on_status="not existing status",
+                fetch_every=0.001,
+                max_retry=10,
+            )
+
+        api.watch_action(1234, desired_status="completed", on_fetch=on_fetch)
+    assert True
+
+
+def test_Api_fetch_ssh_keys():
+    api = get_api()
+    with HTTMock(mock_ssh_keys_fetch_response):
+        api.fetch_ssh_keys()
+    assert True
+
+
+def test_Api_fetch_ssh_key():
+    api = get_api()
+    with HTTMock(mock_ssh_key_fetch_response):
+        api.fetch_ssh_key(123)
+    assert True
+
+
+def test_Api_create_ssh_key():
+    api = get_api()
+    with HTTMock(mock_ssh_key_create_response, mock_ssh_key_create_fetch_response):
+        api.create_ssh_key("my-secret-key", "test-key")
+    assert True
+
+
+def test_Api_delete_ssh_key():
+    api = get_api()
+    with HTTMock(mock_ssh_key_delete_response):
+        api.delete_ssh_key(1234)
     assert True
