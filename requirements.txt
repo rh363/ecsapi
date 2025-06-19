@@ -30,5 +30,5 @@ python-dotenv==1.0.1
 PyYAML==6.0.2
 requests==2.32.3
 typing_extensions==4.12.2
-urllib3==2.3.0
+urllib3==2.5.0
 virtualenv==20.29.2
