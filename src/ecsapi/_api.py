@@ -661,9 +661,7 @@ class Api:
         windows: Optional[bool],
         timeout: int = None,
     ):
-        body = _CloudScriptUpdateRequest(
-            title=title, content=content, windows=windows
-        )
+        body = _CloudScriptUpdateRequest(title=title, content=content, windows=windows)
         response = self.__patch(
             f"{self.__generate_base_url()}/scripts/{script_id}",
             body=body.model_dump(),
