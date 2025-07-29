@@ -37,7 +37,9 @@ class _PlanAvailableRegionAvailableHostServer(BaseModel):
 
 class _PlanAvailableRegionAvailableHost(BaseModel):
     host: str
-    servers: list[_PlanAvailableRegionAvailableHostServer]
+    servers: Optional[list[_PlanAvailableRegionAvailableHostServer]] = Field(
+        default_factory=list
+    )
 
 
 class _PlanAvailableRegionAvailable(BaseModel):
