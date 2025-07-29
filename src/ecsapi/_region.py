@@ -25,7 +25,7 @@ class _RegionAvailableRequest(BaseModel):
 def decomprime_regions(value):
     if not isinstance(value, list):
         return value
-    if not isinstance(value[0], list):
+    if len(value) == 0 or not isinstance(value[0], list):
         return value
     return value[0]
 
