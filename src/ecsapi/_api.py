@@ -10,6 +10,7 @@ from ._cloud_script import (
     _CloudScriptRetrieveResponse,
     _CloudScriptCreateRequest,
     _CloudScriptCreateResponse,
+    _CloudScriptUpdateRequest,
     _CloudScriptUpdateResponse,
 )
 from ._image import (
@@ -655,12 +656,12 @@ class Api:
     def update_script(
         self,
         script_id: int,
-        title: str,
-        content: str,
-        windows: bool,
+        title: Optional[str],
+        content: Optional[str],
+        windows: Optional[bool],
         timeout: int = None,
     ):
-        body = _CloudScriptCreateRequest(title=title, content=content, windows=windows)
+        body = _CloudScriptUpdateRequest(title=title, content=content, windows=windows)
         response = self.__patch(
             f"{self.__generate_base_url()}/scripts/{script_id}",
             body=body.model_dump(),

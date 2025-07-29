@@ -719,6 +719,13 @@ def test_Api_update_script():
     assert True
 
 
+def test_Api_update_script_optional_params():
+    api = get_api()
+    with HTTMock(mock_cloud_script_update_response):
+        api.update_script(15, None, None, None)
+    assert True
+
+
 def test_Api_delete_script():
     api = get_api()
     with HTTMock(mock_cloud_script_delete_response):
