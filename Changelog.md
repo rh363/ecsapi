@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [ Unreleased ]
 
+## [ 0.1.3 ] 2025-07-29
+
+### Fixed
+
+- Fix available region
+
 ## [ 0.1.2 ] 2025-07-29
 
 ### Fixed
