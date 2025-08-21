@@ -28,31 +28,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - id: setup-python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
-          cache: 'pip'
+          cache: 'poetry'
 
-      - name: Install dependencies
+      - name: Install Poetry
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install poetry
-          poetry install
+
+      - name: Configure Poetry (in-project venv)
+        run: |
+          poetry config virtualenvs.in-project true
+
+      - name: Cache virtualenv
+        id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.poetry-cache.outputs.cache-hit != 'true'
+        run: |
+          poetry install --no-interaction --no-ansi
 
       - name: Test format
         run: |
-          python3 -m pip install black
-          black --check src/ecsapi
+          poetry run black --check src/ecsapi
 
       - name: Test lint
         run: |
-          python3 -m pip install flake8
-          flake8 src/ecsapi
+          poetry run flake8 src/ecsapi
 
       - name: Run tests
         run: |
-          python3 -m pip install pytest pytest-cov
-          pytest --cov
+          poetry run pytest --cov
 
 
   build:
@@ -62,16 +75,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - id: setup-python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-          cache: 'pip'
+          cache: 'poetry'
 
-      - name: Build package
+      - name: Install Poetry
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install poetry
-          poetry install
+
+      - name: Configure Poetry (in-project venv)
+        run: |
+          poetry config virtualenvs.in-project true
+
+      - name: Cache virtualenv
+        id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.poetry-cache.outputs.cache-hit != 'true'
+        run: |
+          poetry install --no-interaction --no-ansi
+
+      - name: Build package
+        run: |
           poetry build
 
       - name: Upload artifact
