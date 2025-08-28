@@ -19,6 +19,7 @@ class Plan(BaseModel):
     windows: bool
     host_type: str
     available: bool
+    default_image: Optional[str] = None
     available_regions: List[Region]
 
 
@@ -60,6 +61,7 @@ class _PlanAvailable(BaseModel):
     windows: bool
     host_type: str
     available: bool
+    default_image: Optional[str] = None
     os_available: List[Image] = Field(..., alias="os_availables")
     region_available: List[_PlanAvailableRegionAvailable] = Field(
         ..., alias="region_availables"
