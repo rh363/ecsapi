@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [ Unreleased ]
 
+## [ 0.3.0 ] 2025-08-28
+
+### Added
+
+- Support default_image flag on Plan
+
 ## [ 0.2.0 ] 2025-08-21
 
 ### Added

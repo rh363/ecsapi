@@ -1,6 +1,6 @@
 [project]
 name = "ecsapi"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple SDK for manage Seeweb ecs api"
 readme = "README.md"
 license = {file = "LICENSE"}
