@@ -489,7 +489,6 @@ class Api:
             timeout=timeout,
         )
         self.__check_response(response)
-        print(response.json())
         plans_response = _PlanAvailableListResponse.model_validate_json(response.text)
         return plans_response.plans
 
